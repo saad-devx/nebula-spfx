@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "replace-this-wp-name-client-side-solution",
+    "id": "29a00cc4-54b8-4a3e-a476-4ae000e655a1",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.20.0"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "replace-this-wp-name description"
+      },
+      "longDescription": {
+        "default": "replace-this-wp-name description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "replace-this-wp-name Feature",
+        "description": "The feature that activates elements of the replace-this-wp-name solution.",
+        "id": "d12cc214-f82c-43c0-b14d-9c2cebbd7bc0",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/replace-this-wp-name.sppkg"
+  }
+}
