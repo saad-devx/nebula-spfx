@@ -1,9 +1,24 @@
 'use strict';
 
-const build = require('@microsoft/sp-build-web');
 const path = require('path')
+const build = require('@microsoft/sp-build-web');
+const postcss = require('gulp-postcss');
+const tailwindcss = require('tailwindcss');
+const autoprefixer = require('autoprefixer');
 
 build.addSuppression(/Warning - \[sass\] The local CSS class/gi);
+
+// tailwindcss buldling task
+const configurePostCSS = build.subTask('configure-postcss', function (gulp, buildOptions, done) {
+  return gulp.src('lib/**/*.css')
+    .pipe(postcss([
+      tailwindcss('./tailwind.config.js'),
+      autoprefixer()
+    ]))
+    .pipe(gulp.dest('lib/'));
+});
+
+build.rig.addPostBuildTask(configurePostCSS);
 
 var getTasks = build.rig.getTasks;
 build.rig.getTasks = function () {
@@ -43,4 +58,3 @@ build.configureWebpack.mergeConfig({
 });
 
 build.initialize(require('gulp'));
-
