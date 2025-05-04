@@ -1,41 +1,65 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Version } from '@microsoft/sp-core-library';
-import {
-  type IPropertyPaneConfiguration,
-  PropertyPaneTextField,
-  PropertyPaneToggle,
-  PropertyPaneDropdown
-} from '@microsoft/sp-property-pane';
-import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import { IReadonlyTheme } from '@microsoft/sp-component-base';
-
 import * as strings from 'ReplaceThisWpNameWebPartStrings';
-import ReplaceThisWpName from './components/ReplaceThisWpName';
+import { Version } from '@microsoft/sp-core-library';
+import { DisplayMode } from '@microsoft/sp-core-library';
+import { IReadonlyTheme } from '@microsoft/sp-component-base';
+import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
+import { type IPropertyPaneConfiguration } from '@microsoft/sp-property-pane';
 
-export interface IReplaceThisWpNameWebPartProps {
+import ReplaceThisWpName from './components/ReplaceThisWpName';
+import { propertyPaneFields, propertyPaneGroups } from './components/lib/prop-pane.config';
+
+interface IReplaceThisWpNameWebPartProps {
+  [key: string]: any;
   description: string;
-  listName: string;
-  showDuration: boolean;
-  ItemsToShow: string;
+  // TypeScript won't let us dynamically add properties at runtime,
+  // but the [key: string]: any allows any properties from propertyPaneFields
 }
 
 export default class ReplaceThisWpNameWebPart extends BaseClientSideWebPart<IReplaceThisWpNameWebPartProps> {
-
   private _isDarkTheme: boolean = false;
   private _environmentMessage: string = '';
 
-  public render(): void {
-    const propPane = {
-      listName: this.properties?.listName || "MyItems",
-      ItemsToShow: this.properties?.ItemsToShow || "all",
-      showDuration: typeof this.properties?.showDuration == "boolean" ? this.properties?.showDuration : true,
+  private getDefaultProps(): Partial<IReplaceThisWpNameWebPartProps> {
+    const defaultProps: Partial<IReplaceThisWpNameWebPartProps> = {
+      description: ''
+    };
+    propertyPaneFields.forEach(field => {
+      defaultProps[field.fieldName] = field.defaultValue;
+    });
+
+    return defaultProps;
+  }
+
+  private getInitializedProps(): IReplaceThisWpNameWebPartProps {
+    const defaultProps = this.getDefaultProps();
+    const result = { ...defaultProps } as IReplaceThisWpNameWebPartProps;
+
+    for (const field of propertyPaneFields) {
+      const propName = field.fieldName;
+      const propValue = this.properties[propName];
+
+      if (propValue !== undefined) {
+        if (typeof field.defaultValue === typeof propValue) result[propName] = propValue;
+        else result[propName] = field.defaultValue;
+      }
     }
+
+    if (this.properties.description !== undefined) {
+      result.description = this.properties.description;
+    }
+
+    return result as IReplaceThisWpNameWebPartProps;
+  }
+
+  public render(): void {
     const element: React.ReactElement<any> = React.createElement(
       ReplaceThisWpName,
       {
-        propPane,
+        propPane: this.getInitializedProps(),
         spContext: this.context,
+        isEditMode: this.displayMode === DisplayMode.Edit,
         isDarkTheme: this._isDarkTheme,
         currentUser: this.context.pageContext.user,
         environmentMessage: this._environmentMessage,
@@ -92,30 +116,7 @@ export default class ReplaceThisWpNameWebPart extends BaseClientSideWebPart<IRep
           header: {
             description: strings.PropertyPaneDescription
           },
-          groups: [
-            {
-              groupName: "Webpart Configuration",
-              groupFields: [
-                PropertyPaneTextField('listName', {
-                  label: 'List Name',
-                  value: 'MyItems'
-                }),
-                PropertyPaneDropdown('ItemsToShow', {
-                  label: 'Items to Show',
-                  options: [
-                    { key: 'all', text: 'All items' },
-                    ...Array.from({ length: 10 }, (_, i) => ({ key: i + 1, text: (i + 1).toString() }))
-                  ]
-                }),
-                PropertyPaneToggle('showDuration', {
-                  label: 'Show Modules Durations',
-                  checked: true,
-                  onText: 'On',
-                  offText: 'Off'
-                }),
-              ]
-            }
-          ]
+          groups: propertyPaneGroups
         }
       ]
     };
