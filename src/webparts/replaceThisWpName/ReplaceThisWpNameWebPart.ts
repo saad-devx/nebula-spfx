@@ -18,39 +18,23 @@ export default class ReplaceThisWpNameWebPart extends BaseClientSideWebPart<IRep
   private _isDarkTheme: boolean = false;
   private _environmentMessage: string = '';
 
-  // Helper function to get initialized properties with defaults
   private getInitializedProps(): IReplaceThisWpNameWebPartProps {
     const result: IReplaceThisWpNameWebPartProps = {};
 
-    // Process all properties from propertyPaneFields
     for (const field of propertyPaneFields) {
-      // Extract the property name (targetProperty)
       const propName = field.targetProperty;
-
-      // Get the current value if it exists
       const propValue = this.properties[propName];
 
-      // Determine default value based on field type
       let defaultValue: any = undefined;
 
-      // Check if it's a toggle field (has checked property)
-      if ('checked' in field.properties) {
-        defaultValue = field.properties.checked;
-      }
-      // Check if it has a default value property
-      else if ('value' in field.properties) {
-        defaultValue = field.properties.value;
-      }
+      if ('checked' in field.properties) defaultValue = field.properties.checked;
+      if ('selectedKey' in field.properties) defaultValue = field.properties.selectedKey;
+      else if ('value' in field.properties) defaultValue = field.properties.value;
 
-      // Set the value, prioritizing user-set value over default
-      if (propValue !== undefined) {
-        result[propName] = propValue;
-      } else if (defaultValue !== undefined) {
-        result[propName] = defaultValue;
-      }
+      if (propValue !== undefined) result[propName] = propValue;
+      else if (defaultValue !== undefined) result[propName] = defaultValue;
     }
 
-    // Add description if it exists
     if (this.properties.description !== undefined) {
       result.description = this.properties.description;
     }
@@ -59,7 +43,6 @@ export default class ReplaceThisWpNameWebPart extends BaseClientSideWebPart<IRep
   }
 
   public render(): void {
-    // Get properties with defaults applied automatically
     const propPane = this.getInitializedProps();
 
     const element: React.ReactElement<any> = React.createElement(

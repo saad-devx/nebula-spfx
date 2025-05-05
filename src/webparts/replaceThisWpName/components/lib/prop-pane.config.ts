@@ -14,7 +14,8 @@ export const propertyPaneFields = [
         options: [
             { key: 'all', text: 'All items' },
             ...Array.from({ length: 10 }, (_, i) => ({ key: i + 1, text: (i + 1).toString() }))
-        ]
+        ],
+        selectedKey: "all"
     }),
     PropertyPaneToggle('showDuration', {
         label: 'Show Modules Durations',

@@ -9,7 +9,7 @@ export default function useService(props: any) {
     const [items, setItems]: any = useState([]);
     const [loading, setLoading]: any = useState(false);
 
-    const itemsToSlice = propPane.ItemsToShow == "all" ? 1000 : +propPane.ItemsToShow;
+    const itemsToSlice = propPane.itemsToShow == "all" ? 1000 : +propPane.itemsToShow;
     const slicedItems = items.slice(0, itemsToSlice);
 
     useEffect(() => {
