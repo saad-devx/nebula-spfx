@@ -5,39 +5,29 @@ import {
 } from '@microsoft/sp-property-pane';
 
 export const propertyPaneFields = [
-    {
-        fieldName: 'listName',
-        fieldConfig: PropertyPaneTextField('listName', {
-            label: 'List Name'
-        }),
-        defaultValue: 'MyItems'
-    },
-    {
-        fieldName: 'ItemsToShow',
-        fieldConfig: PropertyPaneDropdown('ItemsToShow', {
-            label: 'Items to Show',
-            options: [
-                { key: 'all', text: 'All items' },
-                ...Array.from({ length: 10 }, (_, i) => ({ key: i + 1, text: (i + 1).toString() }))
-            ]
-        }),
-        defaultValue: 'all'
-    },
-    {
-        fieldName: 'showDuration',
-        fieldConfig: PropertyPaneToggle('showDuration', {
-            label: 'Show Modules Durations',
-            onText: 'On',
-            offText: 'Off'
-        }),
-        defaultValue: true
-    }
+    PropertyPaneTextField('listName', {
+        label: 'List Name',
+        value: 'MyItems'
+    }),
+    PropertyPaneDropdown('itemsToShow', {
+        label: 'Items to Show',
+        options: [
+            { key: 'all', text: 'All items' },
+            ...Array.from({ length: 10 }, (_, i) => ({ key: i + 1, text: (i + 1).toString() }))
+        ]
+    }),
+    PropertyPaneToggle('showDuration', {
+        label: 'Show Modules Durations',
+        checked: true,
+        onText: 'On',
+        offText: 'Off'
+    })
 ];
 
-// Groups configuration
+// Export the groups configuration
 export const propertyPaneGroups = [
     {
         groupName: "Webpart Configuration",
-        groupFields: propertyPaneFields.map(field => field.fieldConfig)
+        groupFields: propertyPaneFields
     }
 ];

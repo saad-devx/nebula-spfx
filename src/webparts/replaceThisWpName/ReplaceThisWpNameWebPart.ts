@@ -2,64 +2,71 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import * as strings from 'ReplaceThisWpNameWebPartStrings';
 import { Version } from '@microsoft/sp-core-library';
-import { DisplayMode } from '@microsoft/sp-core-library';
-import { IReadonlyTheme } from '@microsoft/sp-component-base';
-import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { type IPropertyPaneConfiguration } from '@microsoft/sp-property-pane';
+import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
+import { IReadonlyTheme } from '@microsoft/sp-component-base';
 
 import ReplaceThisWpName from './components/ReplaceThisWpName';
 import { propertyPaneFields, propertyPaneGroups } from './components/lib/prop-pane.config';
 
-interface IReplaceThisWpNameWebPartProps {
+export interface IReplaceThisWpNameWebPartProps {
   [key: string]: any;
-  description: string;
-  // TypeScript won't let us dynamically add properties at runtime,
-  // but the [key: string]: any allows any properties from propertyPaneFields
+  description?: string;
 }
 
 export default class ReplaceThisWpNameWebPart extends BaseClientSideWebPart<IReplaceThisWpNameWebPartProps> {
   private _isDarkTheme: boolean = false;
   private _environmentMessage: string = '';
 
-  private getDefaultProps(): Partial<IReplaceThisWpNameWebPartProps> {
-    const defaultProps: Partial<IReplaceThisWpNameWebPartProps> = {
-      description: ''
-    };
-    propertyPaneFields.forEach(field => {
-      defaultProps[field.fieldName] = field.defaultValue;
-    });
-
-    return defaultProps;
-  }
-
+  // Helper function to get initialized properties with defaults
   private getInitializedProps(): IReplaceThisWpNameWebPartProps {
-    const defaultProps = this.getDefaultProps();
-    const result = { ...defaultProps } as IReplaceThisWpNameWebPartProps;
+    const result: IReplaceThisWpNameWebPartProps = {};
 
+    // Process all properties from propertyPaneFields
     for (const field of propertyPaneFields) {
-      const propName = field.fieldName;
+      // Extract the property name (targetProperty)
+      const propName = field.targetProperty;
+
+      // Get the current value if it exists
       const propValue = this.properties[propName];
 
+      // Determine default value based on field type
+      let defaultValue: any = undefined;
+
+      // Check if it's a toggle field (has checked property)
+      if ('checked' in field.properties) {
+        defaultValue = field.properties.checked;
+      }
+      // Check if it has a default value property
+      else if ('value' in field.properties) {
+        defaultValue = field.properties.value;
+      }
+
+      // Set the value, prioritizing user-set value over default
       if (propValue !== undefined) {
-        if (typeof field.defaultValue === typeof propValue) result[propName] = propValue;
-        else result[propName] = field.defaultValue;
+        result[propName] = propValue;
+      } else if (defaultValue !== undefined) {
+        result[propName] = defaultValue;
       }
     }
 
+    // Add description if it exists
     if (this.properties.description !== undefined) {
       result.description = this.properties.description;
     }
 
-    return result as IReplaceThisWpNameWebPartProps;
+    return result;
   }
 
   public render(): void {
+    // Get properties with defaults applied automatically
+    const propPane = this.getInitializedProps();
+
     const element: React.ReactElement<any> = React.createElement(
       ReplaceThisWpName,
       {
-        propPane: this.getInitializedProps(),
+        propPane,
         spContext: this.context,
-        isEditMode: this.displayMode === DisplayMode.Edit,
         isDarkTheme: this._isDarkTheme,
         currentUser: this.context.pageContext.user,
         environmentMessage: this._environmentMessage,
